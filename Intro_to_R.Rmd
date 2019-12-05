@@ -1,0 +1,648 @@
+---
+title: "Introduction to R"
+author: "Shaurav Regmi"
+date: "April 02, 2018"
+output: 
+  html_document:
+    theme: united
+    toc: TRUE
+    toc_depth: 4
+    number_sections: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    
+---
+***
+#Data Types and Variable Assignment
+To begin, we will first go over a few of the data types that are commonly used in R as well as how to assign objects to variables in R.
+
+##Numeric
+Numerics in R are similar to Decimal values in other software languages.
+
+```{r}
+10.5/2 # Doing a simple arithmetic operation. 
+```
+
+We can assign values to variables and print them very easily.
+```{r}
+pi <- 3.14159 # Assignment using the leftward operator "<-". You can also use "=". 
+
+pi # Print the object assigned to the variable by simply typing the variable name or writing "print(pi)"
+```
+
+
+In R, we do not have to declare a data type for a variable. The variable gets the data type of the R object assigned to it. 
+```{r}
+class(pi)
+```
+
+
+##Character
+Another common data type is the character.
+
+```{r}
+pi <- "A cool number"
+
+pi
+```
+
+We can freely use the same variable name for a new object and the variable will be assigned the appropriate data type automatically. (R is a "dynamically typed" language).
+```{r}
+class(pi)
+```
+
+We can retrieve sections of a string by using the substr() function.
+```{r}
+substr(pi, start=3, stop=6)
+```
+
+
+##Logical
+Logical values are useful when we need a binary or a boolean flag. This is often done by comparing to values of variables.
+```{r}
+pi <- 3.14159
+
+greater.than.one.flag <- pi > 1 # This also highlights how using the lefthand operator "<-" for variable assignment makes the code much more readable than using "=".
+
+greater.than.one.flag
+```
+
+Let's see the class of the variable we created.
+```{r}
+class(greater.than.one.flag)
+```
+
+##Factor
+Factors in R are essentially objects that can only have a limited number of values. During analysis, it is common to take categorical variables that are coded as numbers and convert them to factors. 
+
+Here we convert a vector of strings into factors. 
+```{r}
+colors <- c("red", "green", "blue", "yellow", "green", "green", "yellow") # Create a vector that contains multiple character values.
+
+f.colors <- factor(colors) # Convert the vector to a factor type
+
+f.colors
+
+table(f.colors)
+```
+
+We can do the same for numeric data types.
+```{r}
+numbers <- c(1, 1, 1, 2, 2, 3, 3, 3, 3)
+
+f.numbers <- factor(numbers)
+
+f.numbers
+```
+
+Quite often, categorical varaibles are ordered (ordinal vs. nominal categorical variables). We can specify the order hierarchy for a factor variable.
+
+```{r}
+numbers2 <- c(1, 30, 700, 45, 88, 200, 465)
+
+f.numbers2 <- factor(numbers2, ordered = TRUE)
+
+f.numbers2
+```
+
+We can split the data into buckets.
+
+```{r}
+f.numbers3 <- cut(numbers2, breaks = c(0, 100, 300, 500, Inf))
+
+f.numbers3
+```
+
+
+#Common Data Structures in R
+In this section, we will take a look at basic usage and some of the most common data structures in R. If at any point you don't understand a function's argument structure, just write "?FunctionName" in the Console to open a help window. Using two question marks - "??FunctionName" - will perform a wider search for that function. 
+
+##Vector 
+A sequence of data elements of the same basic type. 
+
+```{r}
+example.vector <- c(2,6,10)
+example.vector
+```
+
+```{r}
+example.vector2 <- c(1:10)
+example.vector2
+```
+
+```{r}
+example.vector3 <- seq(1, 3, .2)
+example.vector3
+```
+
+```{r}
+example.vector4 <- c("abc", "def", "...", "xyz")
+example.vector4
+```
+
+You can create vectors filled with dummy data very easily. This code generates a vector of 10,000 Normal random variables with a mean of 2 and standard deviation of 100.
+```{r}
+example.vector5 <- rnorm(10000,2,100)
+hist(example.vector5)
+```
+
+
+You can pull distinct elements out of a vector:
+```{r}
+example.vector3[1:5]
+```
+
+
+***
+
+
+##Matrix
+A collection of data elements arranged in a two-dimensional layout. 
+Below is an example of a 3 row and 2 column matrix. 
+
+```{r}
+example.matrix <- matrix(
+                  c(2,6,10,11,17,20), 
+                  nrow=3, 
+                  ncol=2)
+example.matrix
+```
+
+
+To select an element in the mth row and nth column do as follows. This example will print the data element at the third row and second column.
+```{r}
+example.matrix[3,2]
+```
+
+You can also call an entire row by doing the following. This example will print the entire third row.
+```{r}
+example.matrix[3, ]
+```
+
+Similarly, you can call an entire column. This example will print the entire second column.
+```{r}
+example.matrix[ ,2]
+```
+
+You can call  multiple rows and columns by passing a vector as one of the arguments with the c() function.
+This example will pull the entire first and third rows.
+```{r}
+example.matrix[c(1,3), ]
+```
+
+Getting values by specifying row and column position can be time consuming, so we can name each row and column. Typically columns are named and rows are not unless there is a specific need to do so.
+This example will name both the columns and rows in example.matrix We also get the bonus of using a list in the arguments for the dimnames function.
+```{r}
+dimnames(example.matrix) <- list(
+    c("Row1", "Row2", "Row3"),
+    c("Col1", "Col2")
+)
+example.matrix
+```
+
+Now you can pull the data element in the Row3 and Col2 using the names.
+```{r}
+example.matrix["Row3", "Col2"]
+```
+
+After naming the rows and colums, you can still pull the same elements using the index positions that were first defined when the matrix was created.
+```{r}
+example.matrix[3,2]
+```
+
+
+###Adding a new column
+
+You can also combine matrices to add additional columns or rows using the cbind and rbind fuctions.
+```{r}
+example.matrix2 <- matrix(
+  c(100,200,300), 
+  nrow=3, 
+  ncol=1)
+colnames(example.matrix2) <- c("NewColumn")
+column.combination <- cbind(example.matrix, example.matrix2)
+
+column.combination
+```
+
+
+###Adding a new row
+```{r}
+example.matrix3 <- matrix(
+  c(1000,2000), 
+  nrow=1, 
+  ncol=2) 
+rownames(example.matrix3) <- c("NewRow")
+row.combination <- rbind(example.matrix, example.matrix3)
+
+row.combination
+```
+
+
+***
+
+##List
+A collection of data elements where each of the elements is a vector. 
+You can have vectors of different lengths and data types in a list, but each individual vector in the list must be of the same data type. 
+
+
+We will make a list by first creating a few vectors
+
+
+```{r}
+animals.list <- list(Name = c("Flea", "Frog", "Horse"),
+               Weight = c(1, 200, 30000),
+               Mammal = c(FALSE, FALSE, TRUE))
+
+animals.list
+```
+
+
+We can retrieve the elements of the list (vectors) using the following commands.
+```{r}
+animals.list["Name"]
+```
+
+
+We can also retrieve multiple elements:
+```{r}
+animals.list[c("Name", "Mammal")]
+```
+
+
+Retrieve the first element a vector within a list and assign a new value:
+```{r}
+animals.list[["Weight"]][2] = 100
+
+animals.list["Weight"]
+```
+
+
+***
+
+##Data Frame 
+A table which is essentially a list where each component is of the same length. A data frame presents data in a more readable format compatred to a list.This is probably the most common data format that will be used in analysis.
+```{r}
+animals.df <- data.frame(Name = c("Flea", "Frog", "Horse"),
+               Weight = c(1, 200, 30000),
+               Mammal = c(FALSE, FALSE, TRUE))
+animals.df
+```
+
+Unlike a matrix, a data frame can contain columns of different data types. We will be working with data frames heavily in later sections of the guide.
+
+***
+
+#Creating Functions
+
+There are thousands of packages in R that each contain many functions to accomplish very specific tasks. While you can use functions from many packages for the vast majority of your work, it is still sometimes necessary to create your own functions. 
+
+The basic "skeleton" of a function in R looks like this:
+
+```{r}
+FunctionName <- function(argument1, argument2, ..., argumentN) {
+  StatementUsingArguments 
+  return(object)
+}
+```
+
+
+Here we will make a simple function to convert weight from pounds to kilograms.
+
+```{r}
+PoundsToKilograms <- function(pounds){
+  kilograms <- pounds/2.20462 # Thanks for the conversion, Google! 
+  return(kilograms)
+} 
+
+PoundsToKilograms(pounds = 101) # Using the function defined above. 
+
+
+```
+
+***
+
+##If/Else Statements in Function
+We can use if/else statements in a function. We can even use our on pre-defined functions in another function!
+
+```{r}
+IsItOver100Kg <- function(pounds){
+  kilograms <- PoundsToKilograms(pounds) 
+  if(kilograms > 100 ) {
+    return("Over 100 Kilograms!") 
+  } else { 
+    return("Under 100 Kilograms.") 
+  }
+}
+
+IsItOver100Kg(900)
+```
+
+
+***
+
+##For Loop in Function
+```{r}
+P2Kmultiple <- function(pounds){
+
+  kilograms <- vector(mode="numeric", length=0)
+  for(weight in 1:length(pounds)) {
+    kilograms[weight] <- pounds[weight]/2.20462
+  }
+  return(kilograms)
+}
+
+input <- c(1, 100, 700, 20)
+
+P2Kmultiple(input)
+
+
+
+```
+
+
+
+
+We can combine the two functions we made.
+
+```{r}
+P2Kmultiple2 <- function(input){
+  
+  pounds <- input
+  kilograms <- vector(mode ="numeric", length=0)
+  over100 <- vector(mode="character", length=0)
+  
+  for(observation in 1:length(input)) {
+    kilograms[observation] <- input[observation]/2.20462
+    
+    if(kilograms[observation] > 100) {
+      over100[observation] <- "Y"
+    }
+    else { 
+      over100[observation] <- "N"
+    }
+  }
+  
+  return(as.data.frame(cbind(pounds, kilograms, over100)))
+}
+
+input <- c(1, 100, 700, 20)
+
+P2Kmultiple2(input)
+```
+
+
+##Avoiding Unnecessary Steps
+
+Though for loops can sometimes be useful, you should only use them when absolutely necessary. For loops are often inefficient, may cause programs to run solowly or break altogether, and are harder to read and understand.
+
+The for loop in the example above is completely unnecessary, except to demonstrate how one is written. The if statement is also unnecessary as we can create the "over100" variable the same way we created a logical data type. 
+
+Simplified code:
+```{r}
+P2K.simple <- function(input) {
+  pounds <- input
+  kilograms <- input/2.20462
+  over100 <- kilograms > 100
+  return(as.data.frame(cbind(pounds, kilograms, over100)))
+}
+
+ x = P2K.simple(input)
+ 
+ x
+ 
+```
+
+
+***
+
+#Installing and Loading Libraries/Packages
+
+The R Base system contains a number of different functions that allow you to accomplish lots of different basic tasks. One major advantage of R over other software languages is that it is open source. You are able to add packagages (also called libraries) that contain additional tools and functionalities that are not available in the Base system. 
+
+*** 
+
+##Installation
+
+The installation of packages only has to happen once (excluding updates and bug fixes for packages). You can run this code below (wihtout the comment #) in the Console to install these selected packages.
+
+```{r}
+#install.packages(c("plyr", "dplyr" ,"DT", "ggplot2", "plotly", "RODBC"))
+```
+
+***
+
+##Loading
+
+When writing any code in R where you want to use functions outside of the R Base system, you must first load your libraries of interest. Whether you are writing in the Console, in an R Script, or in R Markdown, this step needs to be done. 
+
+```{r}
+library(dplyr)
+```
+
+As you can see, when loading packages, you will get a number of messages. Usually you don't want such messages in a final report. There are a number of knitr options or arguments you can add to your code chunk in Markdown to change what is displayed from your code.
+
+We will load multiple packages at once by putting package names into a vector and using the lapply function. Using the argument "message=FALSE", we can avoid displaying the huge number of generated messages. We can also use the invisible() function to hide outputs from other functions such as lapply. 
+
+Look at the Markdown code istelf to see where to include these knitr options. The full list of knitr options can be found here: https://yihui.name/knitr/options/ (there are a lot).  
+
+```{r message=FALSE, warning=FALSE}
+packages.to.load <- c("plyr", "dplyr" ,"DT", "ggplot2", "plotly", "RODBC")
+
+invisible(lapply(packages.to.load, library, character.only=TRUE))
+```
+
+
+
+***
+
+#Data Import and Export
+To begin working with data, we must first load it into the R environment. R allows you to import both data stored on your local machine or connect directly to SQL server and other databases. In addition, there are a number of datasets already included in the Base R package that are nice to use as practice.
+
+***
+
+##Establishing a Working Directory
+First we should know what our working directory is:
+```{r}
+getwd()
+```
+
+If we wanted to change our working directory we would use the following command. Ignore the "#" sign used to comment out the code. Note that these are forward slashes.
+```{r}
+#setwd("C:/Users/shregmi/Documents")
+```
+
+
+***
+
+##Loading and Saving Data
+
+###Loading R Datasets
+
+For this exercise, we will work with an R dataset - "Auto.rda".
+To load an R dataset, ensure your working directory is configured correctly and run:
+```{r}
+load("C:/Users/shregmi/Documents/Current Projects/R Training/Example Datasets/Auto.rda")
+```
+
+You can view the data as a spreadsheet using fix() in the console. Enter this into the command line without quotes: "fix(Auto)".
+This will open a new tab in RStudio so running this command in an RMarkdown file will halt all subsequent steps until the new spreadsheet tab is closed. 
+
+###Saving R Datasets as CSV
+
+During analysis, you may want to store your data frames as CSV files so that they can be shared. To do this we write:
+```{r}
+write.csv(Auto, file="Autodata.csv")
+```
+This will write the dataset as a CSV file to your working directory. You can write to another directory by specifying the full filepath in the "file =" argument of the write.csv function.
+
+###Loading CSV Datasets
+
+Loading CSV datasets is just as simple as R datasets:
+```{r}
+auto.data <- read.csv(file ="C:/Users/shregmi/Documents/Current Projects/R Training/Autodata.csv", header = TRUE) 
+```
+
+
+###Loading Data from a Server
+
+A great feature in R is the ability to directly access databases such as Microsoft SQL Server. I prefer to do this using some commands in the RODBC package. 
+
+**This particular piece of code may not work for those who have issues accessing the EDW.** Please comment out the entire code chunk below if knitting the Markdown document. 
+
+```{r}
+EDW_handle <- odbcDriverConnect('driver={SQL Server};server=ipe1pr-dwdb-003.ehpr.corp.evolenthealth.com;database=EVH_DW;trusted_connection=true') #Name your handle
+
+Plan_dim_query <- "Select distinct 
+                      Client_ID
+                      ,Client_Name 
+                    from EVH_DW.dbo.plan_dim
+                    where Client_ID > 0
+                    order by Client_ID asc" #Store your query in a variable. This is not necessary but it makes the next step more readable. 
+
+client_dim_query_res <- sqlQuery(EDW_handle, query = Plan_dim_query) #Store your results in an object (data frame)
+
+head(client_dim_query_res, 10) #This will show the first 10 lines of the data frame. If you do not specify the number of rows, the default is 6 rows. 
+```
+
+***
+
+#Exploring Data
+
+***
+
+##Viewing variables
+To find out how large the dataset is, you can use the dim() function. We can see that this dataset has 392 rows and 9 columns. 
+```{r}
+dim(auto.data)
+```
+
+To see the column names we use names() function.
+```{r}
+names(auto.data)
+```
+
+To get basic summary statistics about the data we can use the summary() function.
+```{r}
+summary(auto.data)
+```
+
+We can also get a summary for a single column in the dataset by using the $ operator.
+```{r}
+summary(auto.data$mpg)
+```
+
+
+If we just want a specific summary statistic we can use simple commands:
+```{r}
+mean(auto.data$mpg)
+```
+
+```{r}
+median(auto.data$mpg)
+```
+
+***
+
+##Simple Plotting
+
+Sometimes it is very useful to plot the data to understand its nuances. 
+
+```{r message=FALSE}
+plot(auto.data$weight,auto.data$mpg)
+plot(auto.data$cylinders,auto.data$mpg)
+```
+
+Looking at the plots, it might make sense to treat cylinders as a categorical variable. When one variable is categorical, the plot() command outputs boxplots of the other variable.
+
+```{r}
+cyl <- as.factor(auto.data$cylinders)
+plot(cyl, auto.data$mpg)
+```
+
+Let's label our plot and axes and add some color.
+
+```{r}
+plot(auto.data$weight, auto.data$mpg, xlab="Weight", ylab="MPG", main= "Weight v. Miles per Gallon", col="blue")
+```
+
+***
+
+##Scatterplot Matrix
+
+You can plot more than two variables at once to look at possible correlations between different variables. First we must split the graphing window to how many plots we'd like to show. Below, we set the graphing window to a 4 by 4 matrix.
+
+```{r}
+par(mfrow=c(4,4))
+```
+
+Then we fill each non-diagonal space with the corresponding scatterplot
+
+```{r}
+pairs(~auto.data$mpg+auto.data$weight+auto.data$horsepower+auto.data$year)
+```
+
+We can also save a graph as a PDF to our working directory using the pdf() command and then specifying what we want to plot. Don't forget to run dev.off() once the plot is created.
+```{r}
+pdf("WeightvMPG.pdf")
+plot(auto.data$weight, auto.data$mpg, xlab="Weight", ylab="MPG", col="blue")
+dev.off()
+```
+
+
+We might want to see whether the origin of the car relates to the weight or mpg of the car. In this dataset, origin is a categorical variable that is codified as numbers. 1 = American, 2 = European, 3 = Japanese. Here, we'll just color the observations differently based on origin to see if this is an important variable in predicting mpg.
+
+```{r}
+plot(auto.data$weight, auto.data$mpg, col=auto.data$origin)
+```
+
+Origin seems to be an important variable. 
+
+***
+
+##Simple Modeling
+
+Let's perform a simple regression to see for sure whether or not Origin is an important predictor of MPG.
+
+```{r}
+regression1 <- lm(auto.data$mpg ~ as.factor(auto.data$origin))
+summary(regression1)
+```
+
+Note that since origin is a categorical variable, R will create dummy variables origin2 and origin3. By looking at the p-value for the F-statistic, it seems that origin is a statistically significant predictor of MPG.
+
+
+
+
+<br>
+<br>
+<img style="float: right;" src= "https://www.evolenthealth.com/sites/all/themes/evolentcorporate/logo.png", width="200", height = "50">
+<br>
+<br>
+<br>
+
+***
+```{r echo=FALSE, include=FALSE}
+odbcCloseAll()
+```
